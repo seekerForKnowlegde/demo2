@@ -1,23 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SendHorizonal } from "lucide-react"; // Optional icon lib
 import { useNavigate } from "react-router-dom";
 import PiLoader from "./PiLoader";
+import { usePrompt } from "./PromptContext";
 
 const ChatBot = () => {
+  const { setpromptData, setProgress, setPrompt, prompt } = usePrompt();
+  const [loading, setLoading] = useState(false);
   const suggestions = [
     "Create portfolio for Marine and Aviation for Current year",
     "Draft portfolio for last 3 Underwriter years",
     "Generate multi-region portfolios for Marine Segment",
   ];
 
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        fetch("http://localhost:5000/progress")
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            setProgress(data.progress);
+            if (data.progress === 100) clearInterval(interval);
+          });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [loading]);
+
   const naviagte = useNavigate();
-  const [loading, setLoading] = useState(false);
+
   const handleNext = async () => {
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setLoading(false);
-    naviagte("/generator");
+    setProgress(0);
+    fetch("http://localhost:5000/run-kmeans", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: prompt }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Use either data.global or data.clusters depending on your backend
+        setpromptData(data); // Or data.clusters if you're using clusters
+        setLoading(false);
+        naviagte("/generator");
+      })
+      .catch((err) => {
+        console.error("Failed to fetch data:", err);
+        setLoading(false);
+      })
+      .finally(() => {
+        setLoading(false);
+        fetch("http://localhost:5000/reset-progress", {
+          method: "POST",
+        }).then((res) => res.json());
+      });
   };
+
   if (loading) {
     return <PiLoader />;
   }
@@ -58,6 +99,7 @@ const ChatBot = () => {
             type="text"
             placeholder="Ask our chatbot for the content form you require"
             className="flex-grow border border-gray-300 rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            onChange={(e) => setPrompt(e.target.value)}
           />
           <button
             className="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700"

@@ -1,9 +1,97 @@
 import { Line, LineChart, ResponsiveContainer } from "recharts";
-import { summaryKPIs } from "../data/mockData";
+// import { summaryKPIs } from "../data/mockData";
+import { usePrompt } from "./PromptContext";
 
-function formatNum(n, unit) {
-  if (unit === "$") return `${unit}${(n / 1000).toLocaleString()}K`;
-  return n.toLocaleString();
+export function formatNum(n, unit = "") {
+  if (n === undefined || n === null) return "-";
+
+  const absNum = Math.abs(n);
+  let formatted = "";
+
+  if (absNum >= 1e9) {
+    formatted = (n / 1e9).toFixed(2) + "B";
+  } else if (absNum >= 1e6) {
+    formatted = (n / 1e6).toFixed(2) + "M";
+  } else if (absNum >= 1e3) {
+    formatted = (n / 1e3).toFixed(2) + "K";
+  } else {
+    formatted = n.toLocaleString();
+  }
+
+  return unit === "$" ? `${unit}${formatted}` : `${formatted}`;
+}
+function transformToKPIs(globalData) {
+  return [
+    {
+      label: "Policy Volume",
+      value: globalData.total_policy_volume,
+      unit: "",
+      trend: 0,
+      text: "Current",
+      sparkData: [
+        { value: 10 },
+        { value: 500 },
+        { value: 300 },
+        { value: 2 },
+        { value: 10 },
+        { value: 400 },
+        { value: 50 },
+        { value: 520 },
+        { value: 700 },
+        { value: 20 },
+        { value: 400 },
+        { value: 50 },
+        { value: 520 },
+        { value: 700 },
+      ],
+    },
+    {
+      label: "Total Premium",
+      value: globalData.total_premium,
+      unit: "$",
+      trend: 0,
+      text: "Current",
+      sparkData: [
+        { value: 900 },
+        { value: 300 },
+        { value: 300 },
+        { value: 400 },
+        { value: 10 },
+        { value: 400 },
+        { value: 50 },
+        { value: 520 },
+        { value: 700 },
+        { value: 20 },
+        { value: 400 },
+        { value: 800 },
+        { value: 520 },
+        { value: 700 },
+      ],
+    },
+    {
+      label: "Total Loss",
+      value: globalData.total_loss,
+      unit: "$",
+      trend: 0,
+      text: "Current",
+      sparkData: [
+        { value: 80 },
+        { value: 500 },
+        { value: 300 },
+        { value: 200 },
+        { value: 10 },
+        { value: 40 },
+        { value: 50 },
+        { value: 520 },
+        { value: 700 },
+        { value: 200 },
+        { value: 400 },
+        { value: 10 },
+        { value: 520 },
+        { value: 400 },
+      ],
+    },
+  ];
 }
 
 export const KPICard = ({
@@ -58,6 +146,8 @@ export const KPICard = ({
 };
 
 export default function KPICards() {
+  const { promptData } = usePrompt();
+  const summaryKPIs = transformToKPIs(promptData?.global);
   return (
     <div className="grid gap-4 mt-8 md:grid-cols-3">
       {summaryKPIs.map(({ label, value, unit, trend, text, sparkData }) => (

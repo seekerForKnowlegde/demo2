@@ -8,9 +8,22 @@ import {
   CartesianAxis,
   CartesianGrid,
 } from "recharts";
-import { regionVolumes } from "../data/mockData";
+// import { regionVolumes } from "../data/mockData";
+import { usePrompt } from "./PromptContext";
 
 export default function PolicyVolumeChart() {
+  const { promptData } = usePrompt();
+
+  const countryStats = promptData?.global?.country_stats;
+
+  const regionVolumes = Object.entries(countryStats).map(
+    ([country, volume]) => ({
+      region: country,
+      vol: volume,
+    })
+  );
+
+  console.log("Converted regionVolumes:", regionVolumes);
   return (
     <div className="mt-8 border rounded-lg p-4 h-[250px] shadow-sm">
       <h3 className="text-sm text-gray-500 mb-2">Policy Volume by Region</h3>
