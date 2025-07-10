@@ -3,6 +3,7 @@ import { SendHorizonal } from "lucide-react"; // Optional icon lib
 import { useNavigate } from "react-router-dom";
 import PiLoader from "./PiLoader";
 import { usePrompt } from "./PromptContext";
+const API_URL=import.meta.env.VITE_API_URL
 
 const ChatBot = () => {
   const { setpromptData, setProgress, setPrompt, prompt } = usePrompt();
@@ -17,7 +18,7 @@ const ChatBot = () => {
     let interval;
     if (loading) {
       interval = setInterval(() => {
-        fetch("http://localhost:5000/progress")
+        fetch(`${API_URL}/progress`)
           .then((res) => res.json())
           .then((data) => {
             console.log(data);
@@ -35,7 +36,7 @@ const ChatBot = () => {
   const handleNext = async () => {
     setLoading(true);
     setProgress(0);
-    fetch("http://localhost:5000/run-kmeans", {
+    fetch(`${API_URL}/run-kmeans`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: prompt }),
@@ -53,7 +54,7 @@ const ChatBot = () => {
       })
       .finally(() => {
         setLoading(false);
-        fetch("http://localhost:5000/reset-progress", {
+        fetch(`${API_URL}/reset-progress`, {
           method: "POST",
         }).then((res) => res.json());
       });

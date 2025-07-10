@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PiLoader from "./PiLoader";
 import { usePrompt } from "./PromptContext";
-
+const API_URL=import.meta.env.VITE_API_URL
 export default function PortfolioCard({
   id,
   policyVolume,
@@ -20,7 +20,7 @@ export default function PortfolioCard({
   const { setClusterData, setselectedClusterId } = usePrompt();
   const handleNext = async (id) => {
     setLoading(true);
-    fetch(`http://localhost:5000/cluster/${id}`, {
+    fetch(`${API_URL}/cluster/${id}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -39,7 +39,7 @@ export default function PortfolioCard({
       })
       .finally(() => {
         setLoading(false);
-        fetch("http://localhost:5000/reset-progress", {
+        fetch(`${API_URL}/reset-progress`, {
           method: "POST",
         }).then((res) => res.json());
       });
