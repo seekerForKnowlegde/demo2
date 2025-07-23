@@ -9,6 +9,7 @@ import PortfolioCard from "./components/PortfolioCard";
 // import PortfolioAnalysis from "./components/PortfolioAnalysis";
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import LineSizeOpt from "./components/LineSizeOpt";
 
 const PortfolioGenerator = lazy(() =>
   import("./components/PortfolioGenerator")
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/generator" element={<PortfolioGenerator />} />
           <Route path="/analysis" element={<PortfolioAnalysis />} />
+          <Route path="/linesize" element={<LineSizeOpt />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

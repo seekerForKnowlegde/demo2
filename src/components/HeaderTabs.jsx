@@ -9,7 +9,7 @@ const tabs = [
   "LINE SIZE OPTIMIZATION",
 ];
 
-const tabsRoures = ["/", "/generator", "/analysis", "/"];
+const tabsRoures = ["/", "/generator", "/analysis", "/linesize"];
 
 export default function HeaderTabs() {
   const [active, setActive] = useState(1); // default to "PORTFOLIO GENERATOR"

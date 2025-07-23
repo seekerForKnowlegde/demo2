@@ -60,11 +60,20 @@ function formatDate(dateStr) {
   });
 }
 
-export function PremiumLineChart({ data }) {
-  console.log(data[0]);
+export function PremiumLineChart() {
+  const { promptData, selectedClusterId } = usePrompt();
+  const rawdata =
+    promptData?.["clusters"][selectedClusterId]["yearly_breakdown"];
+
+  const data = Object.entries(rawdata).map(([year, val]) => ({
+    month: year.split(".")[0],
+    Premium: val.premium,
+    Plan: val.count,
+  }));
   if (!Array.isArray(data) || data.length == 0) {
     return <>No Data to display</>;
   }
+
   return (
     <div className="h-60 w-Full  bg-white rounded-lg shadow p-4">
       {" "}
